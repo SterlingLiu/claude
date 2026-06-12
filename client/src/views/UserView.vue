@@ -408,6 +408,11 @@ export default {
 /* ========== Loading State ========== */
 .loading-container {
   padding: 20px 0;
+  min-height: 500px;
+}
+
+.user-container {
+  min-height: 500px;
 }
 
 .loading-card {

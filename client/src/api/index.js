@@ -2,6 +2,9 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import router from '../router'
 
+// 防止 401 重复弹窗
+let isRedirectingToLogin = false
+
 // 创建 axios 实例
 const http = axios.create({
   baseURL: '/api',
@@ -61,12 +64,16 @@ http.interceptors.response.use(
         ElMessage.warning(errorMsg || '请求参数错误')
         break
       case 401:
-        ElMessage.warning('登录已过期，请重新登录')
-        localStorage.clear()
-        router.push({
-          path: '/login',
-          query: { redirect: router.currentRoute.value.fullPath }
-        })
+        if (!isRedirectingToLogin) {
+          isRedirectingToLogin = true
+          ElMessage.warning('登录已过期，请重新登录')
+          localStorage.clear()
+          router.push({
+            path: '/login',
+            query: { redirect: router.currentRoute.value.fullPath }
+          })
+          setTimeout(() => { isRedirectingToLogin = false }, 1000)
+        }
         break
       case 403:
         ElMessage.error('没有权限访问此资源')
@@ -96,11 +103,16 @@ http.interceptors.response.use(
   }
 )
 
-// 重试函数
+// 重试函数（不重试认证错误）
 const retryRequest = async (fn, retries = 2, delay = 1000) => {
   try {
     return await fn()
   } catch (error) {
+    const status = error?.response?.status
+    // 401/403 不重试，直接抛出
+    if (status === 401 || status === 403) {
+      throw error
+    }
     if (retries > 0) {
       await new Promise(resolve => setTimeout(resolve, delay))
       return retryRequest(fn, retries - 1, delay)

@@ -176,12 +176,17 @@ export default {
     const isLogin = computed(() => storage.isLoggedIn())
 
     const fetchUnread = async () => {
-      if (!isLogin.value) return
+      const token = localStorage.getItem('token')
+      if (!token) {
+        unread.value = 0
+        return
+      }
       try {
         const r = await api.getUnreadCount()
         unread.value = r.data.count
       } catch (e) {
-        console.error(e)
+        // 401 时清零，不重试
+        unread.value = 0
       }
     }
 
@@ -568,6 +573,7 @@ export default {
   padding-bottom: 40px;
   position: relative;
   z-index: 1;
+  min-height: calc(100vh - 84px);
 }
 
 /* ========== Footer ========== */
