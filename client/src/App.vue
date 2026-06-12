@@ -148,7 +148,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import {
   Plus, Bell, User, SwitchButton, HomeFilled,
@@ -173,7 +173,7 @@ export default {
     const unread = ref(0)
     const scrolled = ref(false)
 
-    const isLogin = computed(() => storage.isLoggedIn())
+    const isLogin = ref(storage.isLoggedIn())
 
     const fetchUnread = async () => {
       const token = localStorage.getItem('token')
@@ -192,6 +192,7 @@ export default {
 
     const onLogin = () => {
       user.value = storage.getUser()
+      isLogin.value = true
       fetchUnread()
     }
 
@@ -203,6 +204,7 @@ export default {
       if (c === 'logout') {
         storage.clearAuth()
         user.value = {}
+        isLogin.value = false
         unread.value = 0
         router.push('/')
       } else if (c === 'user') {
@@ -242,6 +244,7 @@ export default {
 
     router.afterEach(() => {
       user.value = storage.getUser()
+      isLogin.value = storage.isLoggedIn()
       fetchUnread()
     })
 
