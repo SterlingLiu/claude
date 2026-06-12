@@ -1,0 +1,12 @@
+# robots.txt - 校园失物招领平台
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /uploads/
+
+# Sitemap
+Sitemap: https://lostfound.example.com/sitemap.xml
+
+# 爬虫延迟（秒）
+Crawl-delay: 1

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="校园失物招领与互助平台 - 帮助师生快速找回丢失物品，提供便捷的失物发布和认领服务"/>
+  <meta name="keywords" content="失物招领,校园,互助,丢失物品,认领,潍坊职业学院"/>
+  <meta name="author" content="校园失物招领平台"/>
+  <meta name="robots" content="index, follow"/>
+
+  <!-- Open Graph 标签 - 社交媒体分享 -->
+  <meta property="og:title" content="校园失物招领与互助平台"/>
+  <meta property="og:description" content="帮助师生快速找回丢失物品，提供便捷的失物发布和认领服务"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:locale" content="zh_CN"/>
+
+  <!-- 移动端优化 -->
+  <meta name="theme-color" content="#4f6ef6"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+  <meta name="apple-mobile-web-app-title" content="校园招领"/>
+
+  <!-- 图标 -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>"/>
+
+  <!-- 预连接 - 提升加载速度 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+
+  <title>校园失物招领与互助平台</title>
+</head>
+<body>
+  <!-- 加载占位 -->
+  <div id="app">
+    <style>
+      #app-loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: #f8f9fb;
+        font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      }
+      .loading-spinner {
+        text-align: center;
+      }
+      .loading-spinner .spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #e2e8f0;
+        border-top-color: #4f6ef6;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 16px;
+      }
+      .loading-spinner p {
+        color: #64748b;
+        font-size: 14px;
+        margin: 0;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+    <div id="app-loading">
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>加载中...</p>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
