@@ -38,10 +38,12 @@ app.use('/api/', apiLimiter);
 // Request logging
 app.use(requestLogger);
 
-// Input sanitization - prevent XSS
-app.use(sanitizeMiddleware(['title', 'description', 'nickname', 'contact_info', 'message']));
+// Body parsing
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
-// CORS configuration
+// Input sanitization - prevent XSS（必须在 body 解析之后）
+app.use(sanitizeMiddleware(['title', 'description', 'nickname', 'contact_info', 'message']));
 const corsOptions = {
   origin: process.env.CORS_ORIGIN
     ? process.env.CORS_ORIGIN.split(',').map(s => s.trim())

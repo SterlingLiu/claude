@@ -212,7 +212,7 @@ export default {
     const loading = ref(true)
     const deleting = ref(false)
     const user = ref(storage.getUser())
-    const isLogin = computed(() => storage.isLoggedIn())
+    const isLogin = ref(storage.isLoggedIn())
     const isLost = computed(() => route.path.includes('/lost/'))
 
     const fetchItem = async () => {
