@@ -156,6 +156,7 @@ export default {
   getNotifications: () => retryRequest(() => http.get('/notifications')),
   getUnreadCount: () => retryRequest(() => http.get('/notifications/unread')),
   markRead: (id) => http.put('/notifications/' + id + '/read'),
+  deleteNotification: (id) => retryRequest(() => http.delete('/notifications/' + id)),
 
   // ==================== 文件上传 ====================
   upload: (data) => http.post('/upload', data, {

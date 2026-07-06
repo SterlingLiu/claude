@@ -6,7 +6,9 @@ process.env.PORT = 3001;
 
 // 模拟数据库连接
 jest.mock('../config/db', () => ({
-  query: jest.fn(),
-  end: jest.fn(),
-  getConnection: jest.fn(() => Promise.resolve({ release: jest.fn() }))
+  pool: {
+    query: jest.fn(),
+    getConnection: jest.fn(() => Promise.resolve({ release: jest.fn() }))
+  },
+  testConnection: jest.fn(() => Promise.resolve())
 }));

@@ -1,14 +1,17 @@
-const pool = require('../config/db');
+const { pool } = require('../config/db');
 
 // 允许更新的字段白名单 - 防止越权修改敏感字段
 const ALLOWED_UPDATE_FIELDS = ['nickname', 'phone', 'avatar'];
 
 const user = {
   /**
-   * 根据用户名查找用户（含密码，用于登录验证）
+   * 根据用户名查找用户（含密码，仅用于登录验证）
    */
   async findByUsername(username) {
-    const [rows] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
+    const [rows] = await pool.query(
+      'SELECT id, username, password, nickname, role FROM users WHERE username = ?',
+      [username]
+    );
     return rows[0];
   },
 

@@ -1,4 +1,4 @@
-const pool = require('../config/db');
+const { pool } = require('../config/db');
 
 const notification = {
   /**
@@ -42,6 +42,17 @@ const notification = {
       'UPDATE notifications SET is_read = 1 WHERE id = ? AND to_user_id = ?',
       [id, to_user_id]
     );
+  },
+
+  /**
+   * 删除通知（仅通知接收者可删除）
+   */
+  async delete(id, to_user_id) {
+    const [result] = await pool.query(
+      'DELETE FROM notifications WHERE id = ? AND to_user_id = ?',
+      [id, to_user_id]
+    );
+    return result.affectedRows;
   },
 
   /**

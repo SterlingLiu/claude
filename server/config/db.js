@@ -14,8 +14,7 @@ const pool = mysql.createPool({
   queueLimit: 0,
 
   // 连接超时配置
-  connectTimeout: 10000, // 10秒连接超时
-  acquireTimeout: 10000, // 10秒获取连接超时
+  connectTimeout: 10000,
 
   // 保持连接活跃
   enableKeepAlive: true,
@@ -28,15 +27,15 @@ const pool = mysql.createPool({
   timezone: '+08:00',
 });
 
-// 测试数据库连接
-pool.getConnection()
-  .then(connection => {
-    console.log('✅ 数据库连接成功');
-    connection.release();
-  })
-  .catch(err => {
-    console.error('❌ 数据库连接失败:', err.message);
-    // 不要在这里抛出错误，让应用继续启动
-  });
+/**
+ * 测试数据库连接是否可用
+ * @returns {Promise<void>}
+ * @throws {Error} 连接失败时抛出错误
+ */
+async function testConnection() {
+  const connection = await pool.getConnection();
+  console.log('✅ 数据库连接成功');
+  connection.release();
+}
 
-module.exports = pool;
+module.exports = { pool, testConnection };

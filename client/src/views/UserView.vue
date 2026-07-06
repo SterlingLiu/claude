@@ -123,8 +123,19 @@
                   </div>
                   <p class="notify-message">{{ n.message }}</p>
                 </div>
-                <div class="notify-status" v-if="!n.is_read">
-                  <span class="unread-dot"></span>
+                <div class="notify-actions">
+                  <div class="notify-status" v-if="!n.is_read">
+                    <span class="unread-dot"></span>
+                  </div>
+                  <el-button
+                    class="delete-btn"
+                    type="danger"
+                    size="small"
+                    circle
+                    @click.stop="handleDeleteNotify(n.id)"
+                  >
+                    <el-icon><Delete /></el-icon>
+                  </el-button>
                 </div>
               </div>
             </div>
@@ -279,7 +290,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import {
   Bell, ChatDotRound, Document, Edit, Phone, Timer,
-  User, Check, Plus
+  User, Check, Plus, Delete
 } from '@element-plus/icons-vue'
 import api from '../api'
 import { storage } from '../utils'
@@ -289,7 +300,7 @@ export default {
   name: 'UserView',
   components: {
     Bell, ChatDotRound, Document, Edit, Phone, Timer,
-    User, Check, Plus
+    User, Check, Plus, Delete
   },
   setup() {
     const router = useRouter()
@@ -351,6 +362,16 @@ export default {
       }
     }
 
+    const handleDeleteNotify = async (id) => {
+      try {
+        await api.deleteNotification(id)
+        notifications.value = notifications.value.filter(n => n.id !== id)
+        ElMessage.success('删除成功')
+      } catch (e) {
+        console.error(e)
+      }
+    }
+
     const goItem = (item) => {
       router.push('/' + item._type + '/' + item.id)
     }
@@ -391,7 +412,7 @@ export default {
       tab, loading, saving, notifications, allItems, user,
       unreadCount, editDialog, editForm,
       formatTime, getImageUrl, getPlaceholderImage,
-      openEditDialog, readNotify, handleNotifyClick,
+      openEditDialog, readNotify, handleNotifyClick, handleDeleteNotify,
       goItem, handleImageError, saveEdit
     }
   }
@@ -787,6 +808,23 @@ export default {
   border-radius: 50%;
   background: var(--accent);
   box-shadow: 0 0 0 3px rgba(232, 93, 117, 0.2);
+}
+
+.notify-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+
+.notify-actions .delete-btn {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.notify-card:hover .notify-actions .delete-btn {
+  opacity: 1;
 }
 
 /* ========== Post List ========== */

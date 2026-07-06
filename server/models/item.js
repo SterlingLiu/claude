@@ -1,8 +1,8 @@
-const pool = require('../config/db');
+const { pool } = require('../config/db');
 
-// 允许更新的字段白名单
-const LOST_ALLOWED = ['title', 'category', 'description', 'image_url', 'lost_place', 'lost_time', 'contact_info', 'status'];
-const FOUND_ALLOWED = ['title', 'category', 'description', 'image_url', 'found_place', 'found_time', 'contact_info', 'status'];
+// 允许更新的字段白名单（status 不在此列，防止越权修改认领状态）
+const LOST_ALLOWED = ['title', 'category', 'description', 'image_url', 'lost_place', 'lost_time', 'contact_info'];
+const FOUND_ALLOWED = ['title', 'category', 'description', 'image_url', 'found_place', 'found_time', 'contact_info'];
 
 // ===== 失物 (Lost) =====
 

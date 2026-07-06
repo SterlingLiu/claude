@@ -17,6 +17,7 @@ const mockAuth = (req, res, next) => {
 app.get('/api/notifications', mockAuth, notificationController.list);
 app.get('/api/notifications/unread', mockAuth, notificationController.unreadCount);
 app.put('/api/notifications/:id/read', mockAuth, notificationController.markRead);
+app.delete('/api/notifications/:id', mockAuth, notificationController.delete);
 
 describe('通知模块测试', () => {
 
@@ -95,6 +96,35 @@ describe('通知模块测试', () => {
       notificationModel.markRead.mockRejectedValue(new Error('DB error'));
 
       const res = await request(app).put('/api/notifications/1/read');
+
+      expect(res.status).toBe(500);
+    });
+  });
+
+  describe('DELETE /api/notifications/:id', () => {
+    it('应该成功删除通知', async () => {
+      notificationModel.delete.mockResolvedValue(1);
+
+      const res = await request(app).delete('/api/notifications/1');
+
+      expect(res.status).toBe(200);
+      expect(res.body.msg).toBe('删除成功');
+      expect(notificationModel.delete).toHaveBeenCalledWith('1', 1);
+    });
+
+    it('应该拒绝删除不存在的通知', async () => {
+      notificationModel.delete.mockResolvedValue(0);
+
+      const res = await request(app).delete('/api/notifications/999');
+
+      expect(res.status).toBe(404);
+      expect(res.body.msg).toBe('通知不存在或无权删除');
+    });
+
+    it('应该处理数据库错误', async () => {
+      notificationModel.delete.mockRejectedValue(new Error('DB error'));
+
+      const res = await request(app).delete('/api/notifications/1');
 
       expect(res.status).toBe(500);
     });

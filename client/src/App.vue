@@ -193,7 +193,7 @@ export default {
     const onLogin = () => {
       user.value = storage.getUser()
       isLogin.value = true
-      fetchUnread()
+      startUnreadPolling()
     }
 
     const handleScroll = () => {
@@ -202,6 +202,7 @@ export default {
 
     const handleCmd = (c) => {
       if (c === 'logout') {
+        stopUnreadPolling()
         storage.clearAuth()
         user.value = {}
         isLogin.value = false
@@ -233,19 +234,35 @@ export default {
       }
     }
 
+    // 定时刷新未读通知数（登录状态下每 60 秒一次）
+    let unreadTimer = null
+    const startUnreadPolling = () => {
+      stopUnreadPolling()
+      fetchUnread()
+      unreadTimer = setInterval(fetchUnread, 60000)
+    }
+    const stopUnreadPolling = () => {
+      if (unreadTimer) {
+        clearInterval(unreadTimer)
+        unreadTimer = null
+      }
+    }
+
     onMounted(() => {
       window.addEventListener('scroll', handleScroll, { passive: true })
-      fetchUnread()
+      if (storage.isLoggedIn()) {
+        startUnreadPolling()
+      }
     })
 
     onUnmounted(() => {
       window.removeEventListener('scroll', handleScroll)
+      stopUnreadPolling()
     })
 
     router.afterEach(() => {
       user.value = storage.getUser()
       isLogin.value = storage.isLoggedIn()
-      fetchUnread()
     })
 
     return {

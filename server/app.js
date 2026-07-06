@@ -1,4 +1,11 @@
 require('dotenv').config();
+
+// 启动前校验关键环境变量
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 16) {
+  console.error('❌ 启动失败: JWT_SECRET 必须设置且长度至少 16 个字符');
+  process.exit(1);
+}
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -38,12 +45,7 @@ app.use('/api/', apiLimiter);
 // Request logging
 app.use(requestLogger);
 
-// Body parsing
-app.use(express.json({ limit: '1mb' }));
-app.use(express.urlencoded({ extended: true, limit: '1mb' }));
-
-// Input sanitization - prevent XSS（必须在 body 解析之后）
-app.use(sanitizeMiddleware(['title', 'description', 'nickname', 'contact_info', 'message']));
+// CORS - 必须在 body parsing 之前
 const corsOptions = {
   origin: process.env.CORS_ORIGIN
     ? process.env.CORS_ORIGIN.split(',').map(s => s.trim())
@@ -57,6 +59,9 @@ app.use(cors(corsOptions));
 // Body parsing
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+
+// Input sanitization - prevent XSS（必须在 body 解析之后）
+app.use(sanitizeMiddleware(['title', 'description', 'nickname', 'contact_info', 'message']));
 
 // Static files - upload directory
 const uploadDir = path.join(__dirname, process.env.UPLOAD_DIR || 'uploads');
@@ -142,11 +147,50 @@ app.use((err, req, res, _next) => {
   });
 });
 
-// ============ Start Server ============
-app.listen(PORT, () => {
-  logger.info('服务已启动', {
-    port: PORT,
-    env: process.env.NODE_ENV || 'development',
-    url: 'http://localhost:' + PORT,
+// 先验证数据库连接，连接成功后再启动服务器
+const { testConnection } = require('./config/db');
+testConnection()
+  .then(() => {
+    // ============ Start Server ============
+    const server = app.listen(PORT, () => {
+      logger.info('服务已启动', {
+        port: PORT,
+        env: process.env.NODE_ENV || 'development',
+        url: 'http://localhost:' + PORT,
+      });
+    });
+
+    // 优雅关闭 - 处理 SIGTERM 和 SIGINT 信号
+    function gracefulShutdown(signal) {
+      logger.info(`收到 ${signal} 信号，正在优雅关闭...`);
+
+      server.close(() => {
+        logger.info('HTTP 服务器已关闭');
+      });
+
+      // 关闭数据库连接池
+      const { pool } = require('./config/db');
+      pool.end()
+        .then(() => {
+          logger.info('数据库连接池已关闭');
+          process.exit(0);
+        })
+        .catch(err => {
+          logger.error('关闭数据库连接池时出错', { error: err.message });
+          process.exit(1);
+        });
+
+      // 强制退出超时（30秒）
+      setTimeout(() => {
+        logger.error('优雅关闭超时，强制退出');
+        process.exit(1);
+      }, 30000);
+    }
+
+    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+  })
+  .catch(err => {
+    console.error('❌ 应用启动中止:', err.message);
+    process.exit(1);
   });
-});

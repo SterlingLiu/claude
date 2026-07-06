@@ -50,8 +50,8 @@
 ### 1. 克隆项目
 
 ```bash
-git clone https://github.com/SterlingLiu/claude.git
-cd claude/lostfound
+git clone <your-repo-url>
+cd lostfound
 ```
 
 ### 2. 数据库设置
@@ -105,10 +105,12 @@ npm run dev
 
 - JWT Token 认证（7 天过期）
 - bcrypt 密码加密（10 轮）
-- 请求频率限制（100 次/15 分钟）
+- 请求频率限制（100 次/15 分钟，登录接口 10 次/15 分钟）
 - 输入消毒（XSS 防护）
 - SQL 注入防护（参数化查询）
+- 文件魔数验证（防止文件类型伪装）
 - 文件类型和大小限制（jpg/png/gif/webp，5MB）
+- 密码学安全随机文件名
 
 ---
 
@@ -121,7 +123,8 @@ lostfound/
 │   │   ├── api/        # API 封装
 │   │   ├── views/      # 页面组件
 │   │   ├── components/ # 公共组件
-│   │   └── composables/# 组合函数
+│   │   ├── utils/      # 工具函数
+│   │   └── styles/     # 全局样式
 │   └── package.json
 │
 ├── server/              # 后端
@@ -129,6 +132,9 @@ lostfound/
 │   ├── models/         # 数据模型
 │   ├── middleware/      # 中间件
 │   ├── routes/         # 路由定义
+│   ├── utils/          # 工具函数
+│   ├── config/         # 配置文件
+│   ├── __tests__/      # 后端测试
 │   └── app.js          # 入口文件
 │
 ├── database/            # 数据库脚本
@@ -167,6 +173,7 @@ lostfound/
 | GET | `/api/notifications` | 获取通知列表 |
 | GET | `/api/notifications/unread` | 获取未读通知数 |
 | PUT | `/api/notifications/:id/read` | 标记通知已读 |
+| DELETE | `/api/notifications/:id` | 删除通知 |
 
 > 认证接口需要在请求头中添加 `Authorization: Bearer <token>`
 

@@ -29,3 +29,16 @@ exports.markRead = async (req, res) => {
     res.status(500).json({ code: 500, msg: '操作失败' });
   }
 };
+
+exports.delete = async (req, res) => {
+  try {
+    const affected = await notificationModel.delete(req.params.id, req.user.id);
+    if (affected === 0) {
+      return res.status(404).json({ code: 404, msg: '通知不存在或无权删除' });
+    }
+    res.json({ code: 0, msg: '删除成功' });
+  } catch (err) {
+    console.error('[删除通知]', err);
+    res.status(500).json({ code: 500, msg: '操作失败' });
+  }
+};

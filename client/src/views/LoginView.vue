@@ -168,7 +168,10 @@ export default {
           })
           ElMessage.success('注册成功，请登录')
           isRegister.value = false
+          // 清空整个表单，避免残留数据造成困惑
+          form.username = ''
           form.password = ''
+          form.nickname = ''
         } else {
           const res = await api.login({
             username: form.username,

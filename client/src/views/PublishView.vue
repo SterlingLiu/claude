@@ -191,6 +191,10 @@ export default {
     const onFileChange = (e) => {
       const selectedFile = e.target.files[0]
       if (selectedFile) {
+        // 释放旧的 blob URL 防止内存泄漏
+        if (previewUrl.value) {
+          URL.revokeObjectURL(previewUrl.value)
+        }
         // 验证文件大小
         if (selectedFile.size > 5 * 1024 * 1024) {
           ElMessage.warning('文件大小不能超过 5MB')
