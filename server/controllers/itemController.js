@@ -1,5 +1,24 @@
 const itemModel = require('../models/item');
 const notificationModel = require('../models/notification');
+const path = require('path');
+const fs = require('fs');
+
+const UPLOAD_DIR = path.join(__dirname, '..', process.env.UPLOAD_DIR || 'uploads');
+
+// 删除物品时清理关联的图片文件
+function cleanupItemImage(imageUrl) {
+  if (!imageUrl) return;
+  // imageUrl 格式为 /uploads/filename.ext
+  const filename = path.basename(imageUrl);
+  const filepath = path.join(UPLOAD_DIR, filename);
+  if (fs.existsSync(filepath)) {
+    try {
+      fs.unlinkSync(filepath);
+    } catch (err) {
+      console.error('[清理图片文件失败]', err.message);
+    }
+  }
+}
 
 // 允许的物品分类
 const CATEGORIES = ['证件', '电子产品', '生活用品', '衣物', '钥匙', '书本', '其他'];
@@ -83,9 +102,14 @@ exports.createLost = async (req, res) => {
 
 exports.deleteLost = async (req, res) => {
   try {
+    // 先获取物品信息以清理图片
+    const lost = await itemModel.findLostById(req.params.id);
     const affected = await itemModel.deleteLost(req.params.id, req.user.id);
     if (affected === 0) {
       return res.status(404).json({ code: 404, msg: '物品不存在或无权删除' });
+    }
+    if (lost && lost.image_url) {
+      cleanupItemImage(lost.image_url);
     }
     res.json({ code: 0, msg: '删除成功' });
   } catch (err) {
@@ -169,9 +193,13 @@ exports.createFound = async (req, res) => {
 
 exports.deleteFound = async (req, res) => {
   try {
+    const found = await itemModel.findFoundById(req.params.id);
     const affected = await itemModel.deleteFound(req.params.id, req.user.id);
     if (affected === 0) {
       return res.status(404).json({ code: 404, msg: '物品不存在或无权删除' });
+    }
+    if (found && found.image_url) {
+      cleanupItemImage(found.image_url);
     }
     res.json({ code: 0, msg: '删除成功' });
   } catch (err) {

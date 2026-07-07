@@ -172,6 +172,7 @@ describe('物品模块测试', () => {
   describe('DELETE /api/lost/:id - 删除失物', () => {
 
     it('应该成功删除失物', async () => {
+      itemModel.findLostById.mockResolvedValue({ id: 1, image_url: '/uploads/test.jpg' });
       itemModel.deleteLost.mockResolvedValue(1);
 
       const res = await request(app).delete('/api/lost/1');
@@ -181,6 +182,7 @@ describe('物品模块测试', () => {
     });
 
     it('应该处理物品不存在或无权删除', async () => {
+      itemModel.findLostById.mockResolvedValue(null);
       itemModel.deleteLost.mockResolvedValue(0);
 
       const res = await request(app).delete('/api/lost/999');
@@ -229,6 +231,7 @@ describe('物品模块测试', () => {
     });
 
     it('DELETE /api/found/:id 应该成功删除招领', async () => {
+      itemModel.findFoundById.mockResolvedValue({ id: 1, image_url: '/uploads/test.jpg' });
       itemModel.deleteFound.mockResolvedValue(1);
 
       const res = await request(app).delete('/api/found/1');
