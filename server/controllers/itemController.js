@@ -7,10 +7,13 @@ const UPLOAD_DIR = path.join(__dirname, '..', process.env.UPLOAD_DIR || 'uploads
 
 // 删除物品时清理关联的图片文件
 function cleanupItemImage(imageUrl) {
-  if (!imageUrl) return;
-  // imageUrl 格式为 /uploads/filename.ext
+  if (!imageUrl || typeof imageUrl !== 'string') return;
   const filename = path.basename(imageUrl);
+  // 防御：basename 在空字符串或路径遍历时可能返回 '.' 或 '..'
+  if (!filename || filename === '.' || filename === '..') return;
   const filepath = path.join(UPLOAD_DIR, filename);
+  // 二次校验：确保路径在 uploads 目录内，防止路径遍历
+  if (!filepath.startsWith(UPLOAD_DIR)) return;
   if (fs.existsSync(filepath)) {
     try {
       fs.unlinkSync(filepath);

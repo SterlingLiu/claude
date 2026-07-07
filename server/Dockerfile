@@ -3,7 +3,7 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 
 # 安装依赖
-COPY server/package*.json ./
+COPY package*.json ./
 RUN npm ci --only=production
 
 # 复制源码
